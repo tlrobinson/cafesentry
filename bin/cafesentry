@@ -1,0 +1,60 @@
+#!/usr/bin/env node
+
+const fs = require("fs");
+const path = require("path");
+const parseArgs = require("yargs-parser");
+const merge = require("deepmerge");
+const homedir = require("homedir");
+
+const cafesentry = require("../index.js");
+
+const DEFAULT_CONF_PATH = path.join(homedir(), ".cafesentry.conf");
+
+const PARSE_ARGS_OPTIONS = {
+  alias: {
+    conf: ["c"],
+    verbose: ["v"]
+  },
+  default: {
+    init: ["lock"],
+    check: ["power", "devices"],
+    report: ["console", "imessage"],
+    conf: fs.existsSync(DEFAULT_CONF_PATH) ? DEFAULT_CONF_PATH : null
+  },
+  array: ["init", "check", "report"],
+  boolean: ["verbose", "lock"]
+};
+
+const cliConfig = parseArgs(process.argv.slice(2), PARSE_ARGS_OPTIONS);
+const confConfig = cliConfig.conf
+  ? JSON.parse(fs.readFileSync(cliConfig.conf))
+  : {};
+
+// split on ",", remove empty strings
+function normalizeModuleArg(array) {
+  for (var i = array.length - 1; i >= 0; i--) {
+    array.splice(i, 1, ...array[i].split(",").filter(s => s));
+  }
+}
+normalizeModuleArg(cliConfig.init);
+normalizeModuleArg(cliConfig.check);
+normalizeModuleArg(cliConfig.report);
+
+// delete irrelevant stuff
+for (const name in cliConfig) {
+  if (name.length === 1 || name === "conf") {
+    delete cliConfig[name];
+  }
+}
+
+// merge conf file and cli config
+const config = merge(confConfig, cliConfig);
+
+if (config.verbose) {
+  console.log("starting cafesentry with config:");
+  console.log(JSON.stringify(config, null, 2));
+}
+
+if (!cafesentry(config)) {
+  process.exit(1);
+}

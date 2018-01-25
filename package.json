@@ -1,0 +1,24 @@
+{
+  "name": "cafesentry",
+  "version": "1.0.0",
+  "main": "index.js",
+  "license": "MIT",
+  "dependencies": {
+    "child-process-promise": "^2.2.1",
+    "deepmerge": "^2.0.1",
+    "escape-string-applescript": "^2.0.0",
+    "homedir": "^0.6.0",
+    "yargs-parser": "^9.0.2"
+  },
+  "bin": {
+    "cafesentry": "./bin/cafesentry"
+  },
+  "scripts": {
+    "precommit": "pretty-quick --staged"
+  },
+  "devDependencies": {
+    "husky": "^0.14.3",
+    "prettier": "^1.10.2",
+    "pretty-quick": "^1.2.2"
+  }
+}

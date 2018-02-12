@@ -2,8 +2,8 @@ module.exports = config => {
   const errors = [];
 
   const inits = getModules(config, "init", errors);
-  const checks = getModules(config, "check", errors);
-  const reports = getModules(config, "report", errors);
+  const triggers = getModules(config, "trigger", errors);
+  const alerts = getModules(config, "alert", errors);
 
   if (errors.length > 0) {
     for (const error of errors) {
@@ -18,24 +18,24 @@ module.exports = config => {
 
   const state = {};
   const timer = setInterval(() => {
-    check(config, checks, reports, state);
+    runTriggers(triggers, alerts, state);
   }, 1000);
 
   return true;
 };
 
-async function check(config, checks, reports, state) {
+async function runTriggers(triggers, alerts, state) {
   try {
-    for (const [checkName, checkFn] of checks) {
+    for (const [triggerName, triggerFn] of triggers) {
       try {
-        const oldState = state[checkName];
-        const newState = await checkFn();
-        state[checkName] = newState;
+        const oldState = state[triggerName];
+        const newState = await triggerFn();
+        state[triggerName] = newState;
         if (oldState != null && oldState !== newState) {
-          await report(config, reports, checkName, newState, oldState);
+          await runAlerts(alerts, triggerName, newState, oldState);
         }
       } catch (e) {
-        console.error(`Check ${checkName} failed:`, e);
+        console.error(`Check ${triggerName} failed:`, e);
       }
     }
   } catch (e) {
@@ -43,13 +43,13 @@ async function check(config, checks, reports, state) {
   }
 }
 
-async function report(config, reports, check, message, lastMessage) {
+async function runAlerts(alerts, trigger, message, lastMessage) {
   const date = new Date();
-  for (const [reportName, reportFn] of reports) {
+  for (const [alertName, alertFn] of alerts) {
     try {
-      await reportFn(config, date, check, message, lastMessage);
+      await alertFn(date, trigger, message, lastMessage);
     } catch (e) {
-      console.error(`Reporter ${reportName} failed:`, e);
+      console.error(`Reporter ${alertName} failed:`, e);
     }
   }
 }
@@ -76,10 +76,7 @@ function getModules(config, type, errors) {
   for (const name of config[type]) {
     try {
       const module = getModule(type, name);
-      if (module.checkConfig) {
-        module.checkConfig(config);
-      }
-      modules.push([name, module]);
+      modules.push([name, module(config)]);
     } catch (message) {
       errors.push(`[${type}-${name}]: ${message}`);
     }

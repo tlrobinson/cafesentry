@@ -34,7 +34,7 @@ const sendIMessageFile = (exports.sendIMessageFile = function(
   imessageConfig,
   path
 ) {
-  return sendIMessage(config, `(POSIX file "${esa(path)}")`);
+  return sendIMessage(imessageConfig, `(POSIX file "${esa(path)}")`);
 });
 
 const takePhoto = (exports.takePhoto = async function(config) {

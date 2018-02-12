@@ -2,7 +2,7 @@ const { exec } = require("child-process-promise");
 
 const EXCLUDED_DEVICES = /^Root$|^Root Hub Simulation Simulation|^iBridge/;
 
-module.exports = async () =>
+module.exports = config => async () =>
   (await exec("ioreg -p IOUSB")).stdout
     .split("\n")
     .map(line => line.match(/\+\-o\s*([^<]+)\s*</))

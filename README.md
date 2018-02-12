@@ -20,10 +20,10 @@ yarn global add cafesentry
 
 ## Usage
 
-To test `cafesentry` without locking your computer or sending reports to iMessage:
+To test `cafesentry` without locking your computer or sending alerts to iMessage:
 
 ```bash
-cafesentry --init="" --report="console"
+cafesentry --init="" --alert="console"
 ```
 
 Configure the iMessage phone number to send alerts to.
@@ -48,10 +48,10 @@ After configuring, just run `cafesentry` when you step away from your computer.
 cafesentry
 ```
 
-Change which initializations, checks, and reports are run:
+Change which initializations, triggers, and alerts are run:
 
 ```bash
-cafesentry --init="" --check="power" --report="console,imessage-photo"
+cafesentry --init="" --trigger="power" --alert="console,imessage-photo"
 ```
 
 ## Current Modules
@@ -73,10 +73,10 @@ cafesentry --init="" --check="power" --report="console,imessage-photo"
 
 ## Plugins
 
-Plugins can be published on npm with names like `cafesentry-plugin-check-foo`, `cafesentry-plugin-report-bar`, `cafesentry-plugin-init-baz`.
+Plugins can be published on npm with names like `cafesentry-plugin-trigger-foo`, `cafesentry-plugin-alert-bar`, `cafesentry-plugin-init-baz`.
 
-* Check: [power.js](https://github.com/tlrobinson/cafesentry/blob/master/check/power.js)
-* Report: [console.js](https://github.com/tlrobinson/cafesentry/blob/master/report/console.js)
+* Check: [power.js](https://github.com/tlrobinson/cafesentry/blob/master/trigger/power.js)
+* Report: [console.js](https://github.com/tlrobinson/cafesentry/blob/master/alert/console.js)
 * Init: [lock.js](https://github.com/tlrobinson/cafesentry/blob/master/init/lock.js)
 
 ## TODO / Ideas

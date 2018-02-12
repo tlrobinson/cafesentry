@@ -1,3 +1,3 @@
 const { lockScreen } = require("../util");
 
-module.exports = config => lockScreen();
+module.exports = config => () => lockScreen();

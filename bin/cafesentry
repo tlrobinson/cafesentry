@@ -10,19 +10,22 @@ const cafesentry = require("../index.js");
 
 const DEFAULT_CONF_PATH = path.join(homedir(), ".cafesentry.conf");
 
+const DEFAULT_CONF = {
+  init: ["lock"],
+  trigger: ["power", "devices"],
+  alert: ["console", "imessage"],
+}
+
 const PARSE_ARGS_OPTIONS = {
   alias: {
     conf: ["c"],
     verbose: ["v"]
   },
   default: {
-    init: ["lock"],
-    check: ["power", "devices"],
-    report: ["console", "imessage"],
     conf: fs.existsSync(DEFAULT_CONF_PATH) ? DEFAULT_CONF_PATH : null
   },
-  array: ["init", "check", "report"],
-  boolean: ["verbose", "lock"]
+  array: ["init", "trigger", "alert"],
+  boolean: ["verbose"]
 };
 
 const cliConfig = parseArgs(process.argv.slice(2), PARSE_ARGS_OPTIONS);
@@ -32,13 +35,15 @@ const confConfig = cliConfig.conf
 
 // split on ",", remove empty strings
 function normalizeModuleArg(array) {
-  for (var i = array.length - 1; i >= 0; i--) {
-    array.splice(i, 1, ...array[i].split(",").filter(s => s));
+  if (array) {
+    for (var i = array.length - 1; i >= 0; i--) {
+      array.splice(i, 1, ...array[i].split(",").filter(s => s));
+    }
   }
 }
 normalizeModuleArg(cliConfig.init);
-normalizeModuleArg(cliConfig.check);
-normalizeModuleArg(cliConfig.report);
+normalizeModuleArg(cliConfig.trigger);
+normalizeModuleArg(cliConfig.alert);
 
 // delete irrelevant stuff
 for (const name in cliConfig) {
@@ -48,7 +53,7 @@ for (const name in cliConfig) {
 }
 
 // merge conf file and cli config
-const config = merge(confConfig, cliConfig);
+const config = merge.all([DEFAULT_CONF, confConfig, cliConfig], { arrayMerge: (dst, src) => src });
 
 if (config.verbose) {
   console.log("starting cafesentry with config:");

@@ -54,6 +54,10 @@ const takeVideo = (exports.takeVideo = async function(config, seconds = 5) {
   return path;
 });
 
+const playSound = (exports.playSound = function(path) {
+  return exec(`afplay ${path}`);
+});
+
 const sleepwatcher = (exports.sleepwatcher = function() {
   const p = spawn("sleepwatcher", [
     "-cecho cantsleep",
